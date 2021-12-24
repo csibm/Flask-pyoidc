@@ -181,7 +181,7 @@ class OIDCAuthentication:
                                           refresh_token=result.refresh_token)
 
         if self._post_auth_fn is not None:
-            self.post_auth_fn(result)
+            self._post_auth_fn(result)
 
         destination = flask.session.pop('destination')
         if is_processing_fragment_encoded_response:
