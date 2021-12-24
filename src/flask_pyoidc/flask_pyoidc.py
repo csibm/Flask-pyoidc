@@ -42,7 +42,7 @@ class OIDCAuthentication:
     OIDCAuthentication object for Flask extension.
     """
 
-    def __init__(self, provider_configurations, app=None, redirect_uri_config=None):
+    def __init__(self, provider_configurations, app=None, redirect_uri_config=None, post_auth_fn=None):
         """
         Args:
             provider_configurations (Mapping[str, ProviderConfiguration]):
@@ -57,6 +57,7 @@ class OIDCAuthentication:
         self._logout_view = None
         self._error_view = None
         self._redirect_uri_config = redirect_uri_config
+        self._post_auth_fn = post_auth_fn
 
         if app:
             self.init_app(app)
@@ -178,6 +179,9 @@ class OIDCAuthentication:
                                           id_token_jwt=result.id_token_jwt,
                                           userinfo=result.userinfo_claims,
                                           refresh_token=result.refresh_token)
+
+        if self._post_auth_fn is not None:
+            self.post_auth_fn(result)
 
         destination = flask.session.pop('destination')
         if is_processing_fragment_encoded_response:
